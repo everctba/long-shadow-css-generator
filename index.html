@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Long Shadow Text</title>
+<style>
+  :root { --bg: #fff; --fg: #000; --accent: #1f6feb; --muted: #6b7280; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }
+  .app { display: grid; grid-template-columns: 380px 1fr; gap: 24px; padding: 24px; height: 100%; }
+  .panel { border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
+  .panel h1 { font-size: 18px; margin: 0 0 14px; }
+  .control { margin-bottom: 16px; }
+  .control label { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .control input[type="text"] { width: 100%; padding: 10px 12px; font-size: 16px; border: 1px solid #e5e7eb; border-radius: 8px; }
+  .control input[type="range"] { width: 100%; }
+  .value { color: var(--fg); font-weight: 600; }
+  .preview { display: flex; align-items: center; justify-content: center; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; min-height: 420px; }
+  .text { font-size: 96px; line-height: 1; font-weight: 800; color: var(--fg); word-break: break-word; text-align: center; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .footer { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .code-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .code-block { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 13px; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; overflow: auto; max-height: 220px; }
+  .btn { appearance: none; border: 1px solid #e5e7eb; background: #f3f4f6; color: #111827; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+  .btn:hover { background: #e5e7eb; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="panel">
+    <h1>Configurações</h1>
+    <div class="control">
+      <label for="texto"><span>Texto</span></label>
+      <input id="texto" type="text" placeholder="Lorem Ipsum" />
+    </div>
+    <div class="control">
+      <label for="quantidade"><span>Quantidade de sombras</span><span class="value" id="quantidadeVal"></span></label>
+      <input id="quantidade" type="range" min="1" max="300" step="1" />
+    </div>
+    <div class="row">
+      <div class="control">
+        <label for="distancia"><span>Distância por passo (px)</span><span class="value" id="distanciaVal"></span></label>
+        <input id="distancia" type="range" min="0" max="10" step="0.01" />
+      </div>
+      <div class="control">
+        <label for="angulo"><span>Ângulo (°)</span><span class="value" id="anguloVal"></span></label>
+        <input id="angulo" type="range" min="0" max="360" step="1" />
+      </div>
+    </div>
+    <div class="control">
+        <label for="cor"><span>Cor da sombra</span><span class="value" id="corVal"></span></label>
+      <input id="cor" type="color" value="#636363" />
+    </div>
+    <div class="control">
+      <label for="alpha"><span>Alpha da sombra</span><span class="value" id="alphaVal"></span></label>
+      <input id="alpha" type="range" min="0" max="1" step="0.01" />
+    </div>
+    <div class="row">
+      <div class="control">
+        <label for="modoTransparencia"><span>Modo de transparência</span><span class="value" id="modoVal"></span></label>
+        <select id="modoTransparencia">
+          <option value="linear">Linear</option>
+          <option value="percentual">Percentual</option>
+        </select>
+      </div>
+      <div class="control">
+        <label for="decaimento"><span>Decaimento (%)</span><span class="value" id="decaimentoVal"></span></label>
+        <input id="decaimento" type="range" min="0" max="50" step="1" />
+      </div>
+    </div>
+    <div class="footer">0° para a direita, sentido horário. Transparência decresce linearmente ao longo das sombras.</div>
+  </div>
+  <div class="panel preview" id="previewPanel">
+    <div id="textoPreview" class="text"></div>
+  </div>
+  <div class="panel">
+    <div class="code-header">
+      <h1>CSS gerado</h1>
+      <button id="copiarCss" class="btn">Copiar CSS</button>
+    </div>
+    <div class="row">
+      <div class="control">
+        <label for="corTexto"><span>Cor do texto</span><span class="value" id="corTextoVal"></span></label>
+        <input id="corTexto" type="color" value="#000000" />
+      </div>
+      <div class="control">
+        <label for="corFundo"><span>Cor do fundo</span><span class="value" id="corFundoVal"></span></label>
+        <input id="corFundo" type="color" value="#ffffff" />
+      </div>
+    </div>
+    <pre id="cssOutput" class="code-block"></pre>
+  </div>
+</div>
+<script>
+  const elTexto = document.getElementById('texto');
+  const elQuantidade = document.getElementById('quantidade');
+  const elDistancia = document.getElementById('distancia');
+  const elAngulo = document.getElementById('angulo');
+  const elQuantidadeVal = document.getElementById('quantidadeVal');
+  const elDistanciaVal = document.getElementById('distanciaVal');
+  const elAnguloVal = document.getElementById('anguloVal');
+  const elPreview = document.getElementById('textoPreview');
+  const elCssOutput = document.getElementById('cssOutput');
+  const elCopiarCss = document.getElementById('copiarCss');
+  const elCor = document.getElementById('cor');
+  const elCorVal = document.getElementById('corVal');
+  const elAlpha = document.getElementById('alpha');
+  const elAlphaVal = document.getElementById('alphaVal');
+  const elModo = document.getElementById('modoTransparencia');
+  const elModoVal = document.getElementById('modoVal');
+  const elDecaimento = document.getElementById('decaimento');
+  const elDecaimentoVal = document.getElementById('decaimentoVal');
+  const elCorTexto = document.getElementById('corTexto');
+  const elCorTextoVal = document.getElementById('corTextoVal');
+  const elCorFundo = document.getElementById('corFundo');
+  const elCorFundoVal = document.getElementById('corFundoVal');
+  const elPreviewPanel = document.getElementById('previewPanel');
+
+  function atualizarLabels() {
+    elQuantidadeVal.textContent = elQuantidade.value;
+    elDistanciaVal.textContent = parseFloat(elDistancia.value).toFixed(2) + 'px';
+    elAnguloVal.textContent = elAngulo.value + '°';
+    elCorVal.textContent = elCor.value;
+    elAlphaVal.textContent = parseFloat(elAlpha.value).toFixed(2);
+    elCorTextoVal.textContent = elCorTexto.value;
+    elCorFundoVal.textContent = elCorFundo.value;
+    elModoVal.textContent = elModo.value === 'percentual' ? 'Percentual' : 'Linear';
+    elDecaimentoVal.textContent = parseInt(elDecaimento.value, 10) + '%';
+  }
+
+  function hexToRgb(h) {
+    const s = h.replace('#','');
+    const r = parseInt(s.slice(0,2), 16);
+    const g = parseInt(s.slice(2,4), 16);
+    const b = parseInt(s.slice(4,6), 16);
+    return [r,g,b];
+  }
+
+  function gerarSombra() {
+    const texto = elTexto.value || '';
+    const N = parseInt(elQuantidade.value, 10);
+    const step = parseFloat(elDistancia.value);
+    const ang = parseInt(elAngulo.value, 10);
+    const theta = ang * Math.PI / 180;
+    const cos = Math.cos(theta);
+    const sin = Math.sin(theta);
+    const [r,g,b] = hexToRgb(elCor.value);
+    const baseAlpha = parseFloat(elAlpha.value);
+    const textColor = elCorTexto.value;
+    const bgColor = elCorFundo.value;
+    const p = Math.max(0, Math.min(1, parseInt(elDecaimento.value, 10) / 100));
+    const fator = 1 - p;
+
+    const shadows = [];
+    for (let i = 1; i <= N; i++) {
+      const dx = cos * step * i;
+      const dy = sin * step * i;
+      const alpha = elModo.value === 'percentual'
+        ? baseAlpha * Math.pow(fator, i - 1)
+        : baseAlpha * ((N - i + 1) / N);
+      shadows.push(`${dx.toFixed(2)}px ${dy.toFixed(2)}px rgba(${r},${g},${b},${alpha.toFixed(4)})`);
+    }
+
+    elPreview.textContent = texto || 'Lorem Ipsum';
+    elPreview.style.textShadow = shadows.join(', ');
+    elPreview.style.color = textColor;
+    elPreviewPanel.style.background = bgColor;
+    const css = `.long-shadow {\n  color: ${textColor};\n  background: ${bgColor};\n  text-shadow: ${elPreview.style.textShadow};\n}`;
+    elCssOutput.textContent = css;
+  }
+
+  function init() {
+    elTexto.value = '';
+    elQuantidade.value = '62';
+    elDistancia.value = '1';
+    elAngulo.value = '45';
+    elCor.value = '#636363';
+    elAlpha.value = '0.04';
+    elModo.value = 'percentual';
+    elDecaimento.value = '5';
+    elCorTexto.value = '#000000';
+    elCorFundo.value = '#ffffff';
+    atualizarLabels();
+    gerarSombra();
+  }
+
+  elTexto.addEventListener('input', gerarSombra);
+  elQuantidade.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+  elDistancia.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+  elAngulo.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+  elCor.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+  elAlpha.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+  elModo.addEventListener('change', () => { atualizarLabels(); gerarSombra(); });
+  elDecaimento.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+  elCorTexto.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+  elCorFundo.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+
+  init();
+
+  elCopiarCss.addEventListener('click', () => {
+    const code = elCssOutput.textContent || '';
+    const prev = elCopiarCss.textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      elCopiarCss.textContent = 'Copiado!';
+      setTimeout(() => { elCopiarCss.textContent = prev; }, 1200);
+    });
+  });
+</script>
+</body>
+</html>
