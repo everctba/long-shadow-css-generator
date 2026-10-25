@@ -4,22 +4,70 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Long Shadow Text</title>
+  <meta name="color-scheme" content="light" />
+  <title>Long Shadow CSS Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
   <style>
+    /* =============================================================
+       Design tokens — "The Digital Sanctuary"
+       Hierarquia tonal, sem bordas de 1px; profundidade por cor.
+       ============================================================= */
     :root {
-      /* Cores base da interface */
-      --bg: #fff;
-      --fg: #000;
-      --accent: #1f6feb;
-      --muted: #6b7280;
+      color-scheme: light;
 
-      /* Superfícies, bordas e detalhes */
-      --border: #e5e7eb;      /* bordas, divisores e fundo do hover */
-      --surface: #f8fafc;     /* fundo do bloco de código */
-      --btn-bg: #f3f4f6;
-      --btn-fg: #111827;
-      --tooltip-bg: #1f2937;
-      --tooltip-fg: #fff;
+      /* Superfícies (do mais baixo ao mais alto) */
+      --surface: #f8faf3;
+      --surface-container-low: #f2f4ed;
+      --surface-container: #ecefe8;
+      --surface-container-high: #e6eae1;
+      --surface-container-highest: #dfe4da;
+      --surface-container-lowest: #ffffff;
+
+      /* Acentos */
+      --primary: #55624d;
+      --primary-container: #98a68e;
+      --primary-fixed: #d9e7cd;
+      --on-primary: #f7faf3;
+      --secondary: #755754;
+      --secondary-container: #fed7d2;
+
+      /* Texto */
+      --on-surface: #191c18;
+      --on-surface-variant: #444841;
+      --outline-variant: #c5c8be;
+
+      /* Tipografia */
+      --font-display: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --font-body: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+      /* Raios */
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --radius-xl: 1.5rem;
+      --radius-full: 9999px;
+
+      /* Profundidade: sombra ambiente tintada de primary, 40px/0/6% (DS §4) */
+      --shadow-ambient: 0 0 40px rgba(85, 98, 77, 0.06);
+      --shadow-float: 0 0 40px rgba(85, 98, 77, 0.12);
+      --shadow-soft: 0 0 40px rgba(85, 98, 77, 0.06);
+      --ghost-border: inset 0 0 0 1px rgba(197, 200, 190, 0.15);
+
+      /* Movimento: respiração lenta (ease-in-out, 400ms+) */
+      --ease-breath: cubic-bezier(0.45, 0, 0.55, 1);
+      --duration-breath: 420ms;
+
+      /* Gradiente assinatura (DS §2): primary → primary-container, 135°.
+         O 2º stop segura o primary até 82% para o rótulo do CTA (que termina
+         ~78% da pastilha) manter contraste AA; o vidro vem do backdrop-blur. */
+      --gradient-primary: linear-gradient(135deg,
+          rgba(85, 98, 77, 0.97) 0%,
+          rgba(85, 98, 77, 0.97) 82%,
+          rgba(152, 166, 142, 0.72) 100%);
     }
 
     * {
@@ -28,103 +76,150 @@
 
     html,
     body {
-      height: 100%;
+      min-height: 100%;
     }
 
     body {
+      display: flex;
+      flex-direction: column;
       margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      min-height: 100dvh;
+      background:
+        radial-gradient(120% 80% at 8% -12%, #eef2e6 0%, rgba(238, 242, 230, 0) 58%),
+        radial-gradient(90% 70% at 100% 112%, #fbedeb 0%, rgba(251, 237, 235, 0) 62%),
+        var(--surface);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
+    ::selection {
+      background: var(--primary-fixed);
+      color: var(--on-surface);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 3px;
+    }
+
+    /* ---------------------------------------------
+       Shell: três painéis, espaço negativo generoso
+       --------------------------------------------- */
     .app {
       display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 24px;
-      padding: 24px;
-      height: 100%;
+      grid-template-columns: minmax(300px, 336px) minmax(0, 1fr) minmax(320px, 384px);
+      gap: clamp(20px, 2.2vw, 44px);
+      padding: clamp(20px, 2.4vw, 44px);
+      flex: 1 1 auto;
+      align-items: stretch;
     }
 
     .panel {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(20px, 1.8vw, 28px);
+      border-radius: var(--radius-xl);
+      background: var(--surface-container-low);
+      box-shadow: var(--shadow-ambient);
+    }
+
+    .code-block::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .code-block::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .code-block::-webkit-scrollbar-thumb {
+      border: 2px solid transparent;
+      border-radius: var(--radius-full);
+      background: rgba(85, 98, 77, 0.22);
+      background-clip: content-box;
+    }
+
+    /* ---------------------------------------------
+       Cabeçalhos: editorial, assimétrico
+       --------------------------------------------- */
+    .panel-head {
+      margin-bottom: 22px;
+    }
+
+    .eyebrow {
+      display: block;
+      margin-bottom: 6px;
+      font-family: var(--font-body);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
     }
 
     .panel h1 {
-      font-size: 18px;
-      margin: 0 0 14px;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--primary);
     }
 
+    /* ---------------------------------------------
+       Controles
+       --------------------------------------------- */
     .control {
-      margin-bottom: 16px;
-      transition: opacity 0.3s ease, max-height 0.3s ease;
+      /* max-height fixo permite a transição de entrada/saída (auto não interpola) */
+      max-height: 220px;
+      margin-bottom: 18px;
+      transition: opacity var(--duration-breath) var(--ease-breath),
+        max-height var(--duration-breath) var(--ease-breath);
     }
 
     .control.hidden {
-      opacity: 0;
       max-height: 0;
-      overflow: hidden;
       margin-bottom: 0;
+      overflow: hidden;
+      opacity: 0;
       pointer-events: none;
     }
 
     .control label {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 8px;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 9px;
+      font-size: 12.5px;
+      font-weight: 500;
+      letter-spacing: 0.005em;
+      color: var(--on-surface-variant);
     }
 
-    .control input[type="text"] {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 16px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-    }
-
-    .control input[type="range"] {
-      width: 100%;
-    }
-
-    .control select {
-      width: 100%;
-      padding: 8px 12px;
-      font-size: 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg);
-      cursor: pointer;
+    .control label > span:first-child {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      min-width: 0;
     }
 
     .value {
-      color: var(--fg);
-      font-weight: 600;
-    }
-
-    .preview {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      min-height: 420px;
-      transition: background 0.3s ease;
-    }
-
-    .text {
-      font-size: 96px;
-      line-height: 1;
-      font-weight: 800;
-      color: var(--fg);
-      word-break: break-word;
-      text-align: center;
-      transition: color 0.3s ease, text-shadow 0.3s ease, font-size 0.2s ease;
+      flex: 0 0 auto;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+      background: var(--surface-container-lowest);
+      color: var(--primary);
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
     .row {
@@ -133,153 +228,846 @@
       gap: 12px;
     }
 
-    .footer {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 8px;
+    /* Quando um controle do par está oculto, o outro ocupa a linha inteira */
+    .row:has(> .control.hidden) {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 0;
     }
 
-    .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
+    /* Par que precisa de linha inteira (rótulos longos em painel estreito) */
+    .row--stack {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
     }
 
-    .code-block {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 13px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      overflow: auto;
-      max-height: 220px;
+    /* Campos: sem caixa/borda, só superfície e transição de fundo no foco */
+    .control input[type="text"] {
+      width: 100%;
+      padding: 13px 16px;
+      border: none;
+      border-radius: var(--radius-lg);
+      background: var(--surface-container-lowest);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: 15px;
+      outline: none;
+      transition: background-color var(--duration-breath) var(--ease-breath),
+        box-shadow var(--duration-breath) var(--ease-breath);
     }
 
-    .btn {
+    .control input[type="text"]::placeholder {
+      color: #6f756a;
+    }
+
+    .control input[type="text"]:focus {
+      background: var(--primary-fixed);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .control select {
+      width: 100%;
+      padding: 12px 38px 12px 16px;
+      border: none;
+      border-radius: var(--radius-lg);
+      background-color: var(--surface-container-lowest);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.6 6 6.4 11 1.6' fill='none' stroke='%2355624d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 11px 7px;
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      font-weight: 500;
       appearance: none;
-      border: 1px solid var(--border);
-      background: var(--btn-bg);
-      color: var(--btn-fg);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-weight: 600;
+      -webkit-appearance: none;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: background-color var(--duration-breath) var(--ease-breath),
+        box-shadow var(--duration-breath) var(--ease-breath);
+    }
+
+    .control select:focus {
+      outline: none;
+      background-color: var(--primary-fixed);
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* Teclado: mantém o anel de foco visível mesmo com outline removido no :focus */
+    .control input[type="text"]:focus-visible,
+    .control select:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    /* Sliders: trilho tonal, polegar em primary com anel de superfície */
+    .control input[type="range"] {
+      width: 100%;
+      height: 20px;
+      margin: 0;
+      background: transparent;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .control input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: var(--radius-full);
+      background: var(--surface-container-highest);
+    }
+
+    .control input[type="range"]::-webkit-slider-thumb {
+      width: 18px;
+      height: 18px;
+      margin-top: -6px;
+      border: none;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 0 4px var(--surface-container-lowest), 0 2px 10px rgba(85, 98, 77, 0.25);
+      appearance: none;
+      -webkit-appearance: none;
+      transition: transform var(--duration-breath) var(--ease-breath),
+        background-color var(--duration-breath) var(--ease-breath);
+    }
+
+    .control input[type="range"]:hover::-webkit-slider-thumb {
+      transform: scale(1.08);
+    }
+
+    .control input[type="range"]:focus-visible::-webkit-slider-thumb {
+      background: var(--secondary);
+    }
+
+    .control input[type="range"]::-moz-range-track {
+      height: 6px;
+      border-radius: var(--radius-full);
+      background: var(--surface-container-highest);
+    }
+
+    .control input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border: none;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 0 4px var(--surface-container-lowest), 0 2px 10px rgba(85, 98, 77, 0.25);
+    }
+
+    .control input[type="color"] {
+      width: 100%;
+      height: 46px;
+      padding: 5px;
+      border: none;
+      border-radius: var(--radius-lg);
+      background: var(--surface-container-lowest);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: box-shadow var(--duration-breath) var(--ease-breath),
+        transform var(--duration-breath) var(--ease-breath);
+    }
+
+    .control input[type="color"]:hover {
+      box-shadow: var(--shadow-soft);
+    }
+
+    .control input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    .control input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: calc(var(--radius-lg) - 5px);
+    }
+
+    .control input[type="color"]::-moz-color-swatch {
+      border: none;
+      border-radius: calc(var(--radius-lg) - 5px);
+    }
+
+    /* ---------------------------------------------
+       Botões
+       --------------------------------------------- */
+    .btn {
+      flex: 0 0 auto;
+      padding: 12px 22px;
+      border: none;
+      border-radius: var(--radius-full);
+      background-image: var(--gradient-primary);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color: var(--on-primary);
+      font-family: var(--font-display);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: var(--shadow-ambient);
+      appearance: none;
+      transition: transform var(--duration-breath) var(--ease-breath),
+        box-shadow var(--duration-breath) var(--ease-breath),
+        background-color var(--duration-breath) var(--ease-breath),
+        color var(--duration-breath) var(--ease-breath);
     }
 
     .btn:hover {
-      background: var(--border);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-float);
     }
 
-    /* Tooltip styles */
-    .tooltip-icon {
-      cursor: help;
-      color: var(--accent);
-      font-weight: bold;
-      margin-left: 4px;
-      position: relative;
-      display: inline-block;
+    .btn:active {
+      transform: translateY(0);
     }
 
-    .tooltip-icon:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      background: var(--tooltip-bg);
-      color: var(--tooltip-fg);
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: normal;
-      max-width: 220px;
-      width: max-content;
-      z-index: 1000;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      margin-top: 8px;
-      line-height: 1.4;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    /* Momento "recompensa": blush suave do secondary-container */
+    .btn.copiado {
+      background-image: none;
+      background-color: var(--secondary-container);
+      color: var(--secondary);
+      box-shadow: var(--shadow-soft);
     }
 
-    .tooltip-icon:hover::before {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border: 6px solid transparent;
-      border-bottom-color: var(--tooltip-bg);
-      z-index: 1001;
+    /* ---------------------------------------------
+       Rodapé e temas pré-definidos
+       --------------------------------------------- */
+    .footer {
+      margin-top: 14px;
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: var(--on-surface-variant);
+      opacity: 0.78;
     }
 
-    /* Presets styles */
     .presets-section {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
+      margin-top: 44px;
+      padding: 18px;
+      border-radius: var(--radius-xl);
+      background: var(--surface-container);
     }
 
     .presets-section h2 {
-      font-size: 16px;
-      margin: 0 0 12px;
-      color: var(--fg);
+      margin: 0 0 14px;
+      font-family: var(--font-body);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--primary);
     }
 
     .presets-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
     }
 
     .preset-btn {
-      padding: 12px 8px;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      text-align: center;
-      background: var(--bg);
       position: relative;
-      overflow: hidden;
+      padding: 26px 10px 13px;
+      border: none;
+      border-radius: var(--radius-lg);
+      background: var(--surface-container-lowest);
+      color: var(--on-surface-variant);
+      font-family: var(--font-body);
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      text-align: center;
+      cursor: pointer;
+      transition: transform var(--duration-breath) var(--ease-breath),
+        box-shadow var(--duration-breath) var(--ease-breath),
+        background-color var(--duration-breath) var(--ease-breath);
     }
 
     .preset-btn::before {
-      content: '';
+      content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--preset-color, #ccc);
+      top: 10px;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: var(--preset-color, var(--primary-container));
     }
 
     .preset-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-color: var(--preset-color, #ccc);
+      transform: translateY(-1px);
+      background: var(--surface-container-low);
+      box-shadow: var(--shadow-float);
     }
 
     .preset-btn:active {
       transform: translateY(0);
     }
+
+    /* ---------------------------------------------
+       Palco (pré-visualização)
+       --------------------------------------------- */
+    .panel.preview {
+      align-items: center;
+      justify-content: center;
+      min-height: 420px;
+      padding: clamp(24px, 3vw, 72px);
+      background: var(--surface-container-lowest);
+      overflow: hidden;
+      transition: background-color var(--duration-breath) var(--ease-breath);
+    }
+
+    .text {
+      max-width: 100%;
+      font-family: var(--font-display);
+      font-size: 96px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      text-align: center;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      color: var(--on-surface);
+      /* Só a cor anima: o text-shadow muda a cada input e animar seria jank */
+      transition: color var(--duration-breath) var(--ease-breath);
+    }
+
+    /* ---------------------------------------------
+       Painel de saída
+       --------------------------------------------- */
+    .code-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .code-heading .eyebrow {
+      margin-bottom: 4px;
+    }
+
+    .code-heading h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--primary);
+    }
+
+    .code-block {
+      flex: 0 1 auto;
+      min-height: 180px;
+      max-height: min(62vh, 560px);
+      margin: 0;
+      padding: 18px;
+      border: none;
+      border-radius: var(--radius-lg);
+      background: var(--surface-container-lowest);
+      box-shadow: var(--ghost-border);
+      color: var(--on-surface);
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.72;
+      white-space: pre;
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(85, 98, 77, 0.25) transparent;
+      tab-size: 2;
+    }
+
+    /* ---------------------------------------------
+       Tooltip: elemento flutuante em vidro
+       --------------------------------------------- */
+    .tooltip-icon {
+      position: relative;
+      display: inline-block;
+      margin-left: 6px;
+      color: var(--primary-container);
+      font-weight: 700;
+      cursor: help;
+      border-radius: var(--radius-md);
+      transition: color var(--duration-breath) var(--ease-breath);
+    }
+
+    .tooltip-icon:hover,
+    .tooltip-icon:focus-visible {
+      color: var(--primary);
+    }
+
+    /* Vidro claro: surface a ~78% + blur 20px (DS §2) */
+    .tooltip-icon:hover::after,
+    .tooltip-icon:focus-visible::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      z-index: 1000;
+      width: max-content;
+      max-width: 240px;
+      margin-top: 6px;
+      padding: 10px 14px;
+      transform: translateX(-50%);
+      border-radius: var(--radius-md);
+      background: rgba(248, 250, 243, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-float), var(--ghost-border);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 1.55;
+      letter-spacing: 0.005em;
+      text-align: left;
+      pointer-events: none;
+    }
+
+    .tooltip-icon:hover::before,
+    .tooltip-icon:focus-visible::before {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      z-index: 1001;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-bottom-color: rgba(248, 250, 243, 0.88);
+    }
+
+    /* ---------------------------------------------
+       Faixa superior: nav em vidro, flutuante
+       --------------------------------------------- */
+    .topbar {
+      position: sticky;
+      top: clamp(12px, 1.4vw, 18px);
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: clamp(12px, 1.4vw, 18px) clamp(20px, 2.4vw, 44px) 0;
+      padding: 10px 12px 10px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(248, 250, 243, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-ambient);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      border-radius: var(--radius-full);
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-md);
+      background-image: var(--gradient-primary);
+      color: var(--on-primary);
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .brand-name {
+      overflow: hidden;
+      color: var(--primary);
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .brand-sub {
+      color: var(--on-surface-variant);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 15px;
+      border: none;
+      border-radius: var(--radius-full);
+      background: var(--surface-container-lowest);
+      color: var(--primary);
+      font-family: var(--font-display);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      box-shadow: var(--shadow-ambient);
+      transition: background-color var(--duration-breath) var(--ease-breath),
+        color var(--duration-breath) var(--ease-breath),
+        transform var(--duration-breath) var(--ease-breath);
+    }
+
+    .btn-ghost:hover {
+      transform: translateY(-1px);
+      background: var(--primary-fixed);
+    }
+
+    .btn-ghost svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ---------------------------------------------
+       Modal "Sobre"
+       --------------------------------------------- */
+    .modal {
+      width: min(460px, calc(100vw - 32px));
+      max-height: min(92dvh, 720px);
+      padding: 0;
+      overflow-y: auto;
+      border: none;
+      border-radius: var(--radius-xl);
+      background: var(--surface-container-lowest);
+      color: var(--on-surface);
+      box-shadow: 0 0 60px rgba(85, 98, 77, 0.18);
+    }
+
+    .modal::backdrop {
+      background: rgba(25, 28, 24, 0.28);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .modal[open] {
+      animation: modal-in var(--duration-breath) var(--ease-breath);
+    }
+
+    @keyframes modal-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .modal-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 26px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: var(--radius-full);
+      background: var(--surface-container-low);
+      color: var(--on-surface-variant);
+      font-size: 17px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background-color var(--duration-breath) var(--ease-breath),
+        color var(--duration-breath) var(--ease-breath);
+    }
+
+    .modal-close:hover {
+      background: var(--secondary-container);
+      color: var(--secondary);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-right: 30px;
+    }
+
+    .avatar {
+      position: relative;
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      width: 76px;
+      height: 76px;
+      overflow: hidden;
+      border-radius: 50%;
+      background: var(--primary-fixed);
+      box-shadow: 0 0 0 4px var(--surface-container-lowest), 0 0 0 6px rgba(85, 98, 77, 0.12);
+    }
+
+    .avatar-initials {
+      color: var(--primary);
+      font-family: var(--font-display);
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+    }
+
+    .avatar-photo {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .modal-id {
+      min-width: 0;
+    }
+
+    .modal-id h2 {
+      margin: 0;
+      color: var(--primary);
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .modal-role {
+      margin: 3px 0 0;
+      color: var(--on-surface-variant);
+      font-size: 11.5px;
+      line-height: 1.45;
+    }
+
+    .modal-bio {
+      margin: 0;
+      color: var(--on-surface-variant);
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .modal-bio code {
+      padding: 1px 5px;
+      border-radius: 6px;
+      background: var(--surface-container-low);
+      font-family: var(--font-mono);
+      font-size: 0.94em;
+    }
+
+    .meta {
+      display: grid;
+      margin: 0;
+      padding: 2px 16px;
+      border-radius: var(--radius-lg);
+      background: var(--surface-container-low);
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 0;
+    }
+
+    .meta-row dt {
+      color: var(--on-surface-variant);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-row dd {
+      margin: 0;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .meta-row dd a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .meta-row dd a:hover {
+      text-decoration: underline;
+    }
+
+    .social {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .social-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      padding: 12px 6px 10px;
+      border-radius: var(--radius-lg);
+      background: var(--surface-container-low);
+      color: var(--on-surface-variant);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: background-color var(--duration-breath) var(--ease-breath),
+        color var(--duration-breath) var(--ease-breath),
+        transform var(--duration-breath) var(--ease-breath);
+    }
+
+    .social-link svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .social-link:hover {
+      transform: translateY(-1px);
+      background: var(--primary-fixed);
+      color: var(--primary);
+    }
+
+    .modal-foot {
+      color: var(--on-surface-variant);
+      font-size: 10.5px;
+      line-height: 1.5;
+    }
+
+    /* ---------------------------------------------
+       Responsivo
+       --------------------------------------------- */
+    /* Desktop: o palco fica visível durante o scroll e a coluna de saída não
+       estica junto da coluna de ajustes (que é a mais alta) */
+    @media (min-width: 1181px) {
+      .panel--stage {
+        position: sticky;
+        top: 92px;
+        align-self: start;
+        height: calc(100dvh - 136px);
+      }
+
+      .panel--code {
+        align-self: start;
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .app {
+        grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+        align-items: start;
+      }
+
+      .panel.preview {
+        min-height: 380px;
+      }
+
+      .panel--code {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+        padding: 16px;
+      }
+
+      .topbar {
+        margin: 12px 16px 0;
+        padding: 8px 10px 8px 12px;
+      }
+
+      .brand-sub {
+        display: none;
+      }
+
+      .panel--config,
+      .panel--stage,
+      .panel--code {
+        grid-column: auto;
+      }
+
+      .panel.preview {
+        min-height: 300px;
+      }
+
+      .code-block {
+        flex: 0 0 auto;
+        max-height: 320px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition-duration: 1ms !important;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">LS</span>
+      <span class="brand-text">
+        <span class="brand-name">Long Shadow CSS Generator</span>
+        <span class="brand-sub">text-shadow em camadas</span>
+      </span>
+    </div>
+    <button id="abrirSobre" class="btn-ghost" type="button" aria-haspopup="dialog" aria-controls="sobreDialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
+        <path d="M12 10.8v5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        <circle cx="12" cy="7.9" r="1.15" fill="currentColor" />
+      </svg>
+      Sobre
+    </button>
+  </header>
   <div class="app">
-    <div class="panel">
-      <h1>Configurações</h1>
+    <section class="panel panel--config" aria-labelledby="tituloConfig">
+      <header class="panel-head">
+        <span class="eyebrow">Ajustes</span>
+        <h1 id="tituloConfig">Configurações</h1>
+      </header>
       <div class="control">
         <label for="texto"><span>Texto</span></label>
         <input id="texto" type="text" placeholder="Lorem Ipsum" />
       </div>
       <div class="control">
         <label for="tamanhoFonte">
-          <span>Tamanho da Fonte (px) <span class="tooltip-icon"
+          <span>Tamanho da Fonte (px) <span class="tooltip-icon" tabindex="0"
               data-tooltip="Crie o efeito no tamanho do elemento que será utilizado, na mesma proporção. A sombra tem distância fixa e não escala com o tamanho do elemento.">ⓘ</span></span>
           <span class="value" id="tamanhoFonteVal"></span>
         </label>
@@ -296,7 +1084,7 @@
         <label for="quantidade"><span>Quantidade de sombras</span><span class="value" id="quantidadeVal"></span></label>
         <input id="quantidade" type="range" min="1" max="300" step="1" />
       </div>
-      <div class="row">
+      <div class="row row--stack">
         <div class="control">
           <label for="distancia"><span>Distância por passo (px)</span><span class="value"
               id="distanciaVal"></span></label>
@@ -315,7 +1103,7 @@
         <label for="alpha"><span>Alpha da sombra</span><span class="value" id="alphaVal"></span></label>
         <input id="alpha" type="range" min="0" max="1" step="0.01" />
       </div>
-      <div class="row">
+      <div class="row row--stack">
         <div class="control">
           <label for="modoTransparencia"><span>Modo de transparência</span><span class="value"
               id="modoVal"></span></label>
@@ -329,21 +1117,21 @@
           <input id="decaimento" type="range" min="0" max="50" step="1" />
         </div>
       </div>
-      <div class="row">
+      <div class="row row--stack">
         <div class="control">
           <label for="unidadeCss">
-            <span>Unidade do CSS <span class="tooltip-icon"
+            <span>Unidade do CSS <span class="tooltip-icon" tabindex="0"
                 data-tooltip="Escolha entre Proporcional (em / Variáveis CSS) que se ajusta a qualquer tamanho de fonte ou Pixel fixo (px).">ⓘ</span></span>
             <span class="value" id="unidadeCssVal"></span>
           </label>
           <select id="unidadeCss">
-            <option value="em">em / Variáveis CSS (Proporcional)</option>
-            <option value="px">px (Fixo)</option>
+            <option value="em">em / proporcional</option>
+            <option value="px">px / fixo</option>
           </select>
         </div>
         <div class="control" id="escalaControl">
           <label for="escala">
-            <span>Escala (--shadow-scale) <span class="tooltip-icon"
+            <span>Escala (--shadow-scale) <span class="tooltip-icon" tabindex="0"
                 data-tooltip="Multiplicador dinâmico da extensão da sombra via variável CSS.">ⓘ</span></span>
             <span class="value" id="escalaVal">1.0x</span>
           </label>
@@ -353,8 +1141,8 @@
       <div class="footer" id="footerText">0° para a direita, sentido horário.</div>
 
       <!-- Presets Section -->
-      <div class="presets-section">
-        <h2>Temas Pré-definidos</h2>
+      <section class="presets-section">
+        <h2>Temas pré-definidos</h2>
         <div class="presets-grid">
           <button class="preset-btn" data-preset="neon" style="--preset-color: #00ffff;">
             Neon Cyberpunk
@@ -381,20 +1169,25 @@
             Fire/Lava
           </button>
         </div>
-      </div>
-    </div>
-    <div class="panel preview" id="previewPanel">
+      </section>
+    </section>
+
+    <section class="panel preview panel--stage" id="previewPanel">
       <div id="textoPreview" class="text"></div>
-    </div>
-    <div class="panel">
-      <div class="code-header">
-        <h1>CSS gerado</h1>
+    </section>
+
+    <section class="panel panel--code" aria-labelledby="tituloCss">
+      <header class="code-header">
+        <div class="code-heading">
+          <span class="eyebrow">Exportar</span>
+          <h1 id="tituloCss">CSS gerado</h1>
+        </div>
         <button id="copiarCss" class="btn">Copiar CSS</button>
-      </div>
+      </header>
       <div class="row">
         <div class="control">
           <label for="corTexto"><span>Cor do texto</span><span class="value" id="corTextoVal"></span></label>
-          <input id="corTexto" type="color" value="#000000" />
+          <input id="corTexto" type="color" value="#191c18" />
         </div>
         <div class="control">
           <label for="corFundo"><span>Cor do fundo</span><span class="value" id="corFundoVal"></span></label>
@@ -403,7 +1196,7 @@
       </div>
       <div class="control">
         <label for="formatoCores">
-          <span>Cores no CSS gerado <span class="tooltip-icon"
+          <span>Cores no CSS gerado <span class="tooltip-icon" tabindex="0"
               data-tooltip="Variáveis CSS: o bloco copiado expõe --shadow-color, --text-color e --bg-color, então trocar a cor é editar uma linha. Valores fixos: mantém rgba() prontos como antes.">ⓘ</span></span>
           <span class="value" id="formatoCoresVal"></span>
         </label>
@@ -414,8 +1207,85 @@
         </select>
       </div>
       <pre id="cssOutput" class="code-block"></pre>
-    </div>
+    </section>
   </div>
+
+  <dialog id="sobreDialog" class="modal" aria-labelledby="sobreTitulo">
+    <div class="modal-card">
+      <button id="fecharSobre" class="modal-close" type="button" aria-label="Fechar" autofocus>&times;</button>
+
+      <header class="modal-head">
+        <span class="avatar">
+          <span class="avatar-initials" aria-hidden="true">EM</span>
+          <img id="avatarFoto" class="avatar-photo" src="fotoever.jpeg" alt="Foto de perfil de Everson Mayer"
+            width="152" height="152" onerror="this.remove()" />
+        </span>
+        <div class="modal-id">
+          <span class="eyebrow">Sobre</span>
+          <h2 id="sobreTitulo">Everson Mayer</h2>
+          <p class="modal-role">Designer gráfico &amp; front-end · Toledo, Brasil</p>
+        </div>
+      </header>
+
+      <p class="modal-bio">Gerador de <code>text-shadow</code> em camadas: ajuste os passos, veja o efeito e copie o
+        CSS pronto — com as cores já em variáveis. Designer gráfico desde 2010.</p>
+
+      <dl class="meta">
+        <div class="meta-row">
+          <dt>Autor</dt>
+          <dd>Everson Mayer</dd>
+        </div>
+        <div class="meta-row">
+          <dt>E-mail</dt>
+          <dd><a href="mailto:mayerdesigner@gmail.com">mayerdesigner@gmail.com</a></dd>
+        </div>
+        <div class="meta-row">
+          <dt>Site</dt>
+          <dd><a href="https://github.com/everctba" target="_blank" rel="noopener noreferrer">github.com/everctba</a>
+          </dd>
+        </div>
+        <div class="meta-row">
+          <dt>Versão</dt>
+          <dd>1.0.0 · 2026</dd>
+        </div>
+      </dl>
+
+      <nav class="social" aria-label="Perfis e contato de Everson Mayer">
+        <a class="social-link" href="https://www.linkedin.com/in/everson-mayer-68673369/" target="_blank"
+          rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor"
+              d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+          </svg>
+          <span>LinkedIn</span>
+        </a>
+        <a class="social-link" href="https://www.behance.net/Eversonmayer" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor"
+              d="M16.969 16.927a2.561 2.561 0 0 0 1.901.677 2.501 2.501 0 0 0 1.531-.475c.362-.235.636-.584.779-.99h2.585a5.091 5.091 0 0 1-1.9 2.896 5.292 5.292 0 0 1-3.091.88 5.839 5.839 0 0 1-2.284-.433 4.871 4.871 0 0 1-1.723-1.211 5.657 5.657 0 0 1-1.08-1.874 7.057 7.057 0 0 1-.383-2.393c-.005-.8.129-1.595.396-2.349a5.313 5.313 0 0 1 5.088-3.604 4.87 4.87 0 0 1 2.376.563c.661.362 1.231.87 1.668 1.485a6.2 6.2 0 0 1 .943 2.133c.194.821.263 1.666.205 2.508h-7.699c-.063.79.184 1.574.688 2.187ZM6.947 4.084a8.065 8.065 0 0 1 1.928.198 4.29 4.29 0 0 1 1.49.638c.418.303.748.711.958 1.182.241.579.357 1.203.341 1.83a3.506 3.506 0 0 1-.506 1.961 3.726 3.726 0 0 1-1.503 1.287 3.588 3.588 0 0 1 2.027 1.437c.464.747.697 1.615.67 2.494a4.593 4.593 0 0 1-.423 2.032 3.945 3.945 0 0 1-1.163 1.413 5.114 5.114 0 0 1-1.683.807 7.135 7.135 0 0 1-1.928.259H0V4.084h6.947Zm-.235 12.9c.308.004.616-.029.916-.099a2.18 2.18 0 0 0 .766-.332c.228-.158.411-.371.534-.619.142-.317.208-.663.191-1.009a2.08 2.08 0 0 0-.642-1.715 2.618 2.618 0 0 0-1.696-.505h-3.54v4.279h3.471Zm13.635-5.967a2.13 2.13 0 0 0-1.654-.619 2.336 2.336 0 0 0-1.163.259 2.474 2.474 0 0 0-.738.62 2.359 2.359 0 0 0-.396.792c-.074.239-.12.485-.137.734h4.769a3.239 3.239 0 0 0-.679-1.785l-.002-.001Zm-13.813-.648a2.254 2.254 0 0 0 1.423-.433c.399-.355.607-.88.56-1.413a1.916 1.916 0 0 0-.178-.891 1.298 1.298 0 0 0-.495-.533 1.851 1.851 0 0 0-.711-.274 3.966 3.966 0 0 0-.835-.073H3.241v3.631h3.293v-.014ZM21.62 5.122h-5.976v1.527h5.976V5.122Z" />
+          </svg>
+          <span>Behance</span>
+        </a>
+        <a class="social-link" href="https://github.com/everctba" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor"
+              d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <a class="social-link" href="mailto:mayerdesigner@gmail.com">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor"
+              d="M12 13.06 2.6 6.4A2 2 0 0 1 4.5 5h15a2 2 0 0 1 1.9 1.4L12 13.06ZM2 7.9V17.5A2.5 2.5 0 0 0 4.5 20h15a2.5 2.5 0 0 0 2.5-2.5V7.9l-9.44 6.72a1 1 0 0 1-1.12 0L2 7.9Z" />
+          </svg>
+          <span>E-mail</span>
+        </a>
+      </nav>
+
+      <p class="modal-foot">&copy; 2026 Everson Mayer · feito com HTML, CSS e JS puro, sem build.</p>
+    </div>
+  </dialog>
+
   <script>
     const elTexto = document.getElementById('texto');
     const elTamanhoFonte = document.getElementById('tamanhoFonte');
@@ -518,7 +1388,7 @@
       },
       minimal: {
         corFundo: '#ffffff',
-        corTexto: '#000000',
+        corTexto: '#191c18',
         corSombra: '#cccccc',
         alpha: 0.08,
         quantidade: 50,
@@ -602,6 +1472,7 @@
       atualizarVisibilidadeModo();
       gerarSombra();
     }
+
     function hexToRgb(h) {
       const s = h.replace('#', '');
       const r = parseInt(s.slice(0, 2), 16);
@@ -719,7 +1590,7 @@
       elDecaimento.value = '5';
       elUnidadeCss.value = 'em';
       elEscala.value = '1.0';
-      elCorTexto.value = '#000000';
+      elCorTexto.value = '#191c18';
       elCorFundo.value = '#ffffff';
       elFormatoCores.value = 'variaveis';
       atualizarLabels();
@@ -753,14 +1624,54 @@
 
     init();
 
+    const rotuloCopiar = elCopiarCss.textContent;
+    let timerCopiar = null;
+
     elCopiarCss.addEventListener('click', () => {
       const code = elCssOutput.textContent || '';
-      const prev = elCopiarCss.textContent;
-      navigator.clipboard.writeText(code).then(() => {
-        elCopiarCss.textContent = 'Copiado!';
-        setTimeout(() => { elCopiarCss.textContent = prev; }, 1200);
-      });
+
+      function finalizar(ok) {
+        elCopiarCss.textContent = ok ? 'Copiado!' : 'Falhou';
+        elCopiarCss.classList.toggle('copiado', ok);
+        clearTimeout(timerCopiar);
+        timerCopiar = setTimeout(() => {
+          elCopiarCss.textContent = rotuloCopiar;
+          elCopiarCss.classList.remove('copiado');
+        }, 1400);
+      }
+
+      // navigator.clipboard só existe em contexto seguro (https ou file://)
+      if (!navigator.clipboard || !navigator.clipboard.writeText) {
+        finalizar(false);
+        return;
+      }
+
+      navigator.clipboard.writeText(code).then(() => finalizar(true), () => finalizar(false));
     });
+
+    // Modal "Sobre"
+    const elSobreDialog = document.getElementById('sobreDialog');
+    const elAbrirSobre = document.getElementById('abrirSobre');
+    const elFecharSobre = document.getElementById('fecharSobre');
+
+    if (elSobreDialog && elAbrirSobre) {
+      elAbrirSobre.addEventListener('click', () => {
+        if (typeof elSobreDialog.showModal === 'function') {
+          elSobreDialog.showModal();
+        } else {
+          elSobreDialog.setAttribute('open', '');
+        }
+      });
+
+      // clique no fundo (fora do cartão) fecha
+      elSobreDialog.addEventListener('click', (ev) => {
+        if (ev.target === elSobreDialog) elSobreDialog.close();
+      });
+
+      if (elFecharSobre) {
+        elFecharSobre.addEventListener('click', () => elSobreDialog.close());
+      }
+    }
   </script>
 </body>
 
