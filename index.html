@@ -7,10 +7,19 @@
   <title>Long Shadow Text</title>
   <style>
     :root {
+      /* Cores base da interface */
       --bg: #fff;
       --fg: #000;
       --accent: #1f6feb;
       --muted: #6b7280;
+
+      /* Superfícies, bordas e detalhes */
+      --border: #e5e7eb;      /* bordas, divisores e fundo do hover */
+      --surface: #f8fafc;     /* fundo do bloco de código */
+      --btn-bg: #f3f4f6;
+      --btn-fg: #111827;
+      --tooltip-bg: #1f2937;
+      --tooltip-fg: #fff;
     }
 
     * {
@@ -38,7 +47,7 @@
     }
 
     .panel {
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 20px;
     }
@@ -74,7 +83,7 @@
       width: 100%;
       padding: 10px 12px;
       font-size: 16px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--border);
       border-radius: 8px;
     }
 
@@ -86,9 +95,9 @@
       width: 100%;
       padding: 8px 12px;
       font-size: 14px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--border);
       border-radius: 8px;
-      background: white;
+      background: var(--bg);
       cursor: pointer;
     }
 
@@ -101,7 +110,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 24px;
       min-height: 420px;
@@ -140,8 +149,8 @@
     .code-block {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 13px;
-      background: #f8fafc;
-      border: 1px solid #e5e7eb;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 12px;
       overflow: auto;
@@ -150,9 +159,9 @@
 
     .btn {
       appearance: none;
-      border: 1px solid #e5e7eb;
-      background: #f3f4f6;
-      color: #111827;
+      border: 1px solid var(--border);
+      background: var(--btn-bg);
+      color: var(--btn-fg);
       padding: 8px 12px;
       border-radius: 8px;
       font-weight: 600;
@@ -161,7 +170,7 @@
     }
 
     .btn:hover {
-      background: #e5e7eb;
+      background: var(--border);
     }
 
     /* Tooltip styles */
@@ -177,8 +186,8 @@
     .tooltip-icon:hover::after {
       content: attr(data-tooltip);
       position: absolute;
-      background: #1f2937;
-      color: white;
+      background: var(--tooltip-bg);
+      color: var(--tooltip-fg);
       padding: 8px 12px;
       border-radius: 6px;
       font-size: 11px;
@@ -201,7 +210,7 @@
       left: 50%;
       transform: translateX(-50%);
       border: 6px solid transparent;
-      border-bottom-color: #1f2937;
+      border-bottom-color: var(--tooltip-bg);
       z-index: 1001;
     }
 
@@ -209,7 +218,7 @@
     .presets-section {
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid var(--border);
     }
 
     .presets-section h2 {
@@ -226,14 +235,14 @@
 
     .preset-btn {
       padding: 12px 8px;
-      border: 2px solid #e5e7eb;
+      border: 2px solid var(--border);
       border-radius: 8px;
       cursor: pointer;
       font-size: 11px;
       font-weight: 600;
       transition: all 0.2s ease;
       text-align: center;
-      background: white;
+      background: var(--bg);
       position: relative;
       overflow: hidden;
     }
@@ -392,6 +401,18 @@
           <input id="corFundo" type="color" value="#ffffff" />
         </div>
       </div>
+      <div class="control">
+        <label for="formatoCores">
+          <span>Cores no CSS gerado <span class="tooltip-icon"
+              data-tooltip="Variáveis CSS: o bloco copiado expõe --shadow-color, --text-color e --bg-color, então trocar a cor é editar uma linha. Valores fixos: mantém rgba() prontos como antes.">ⓘ</span></span>
+          <span class="value" id="formatoCoresVal"></span>
+        </label>
+        <select id="formatoCores">
+          <option value="variaveis">Variáveis CSS (color-mix)</option>
+          <option value="canais">Variáveis CSS (canais RGB)</option>
+          <option value="fixo">Valores fixos (rgba)</option>
+        </select>
+      </div>
       <pre id="cssOutput" class="code-block"></pre>
     </div>
   </div>
@@ -430,6 +451,8 @@
     const elCorFundoVal = document.getElementById('corFundoVal');
     const elPreviewPanel = document.getElementById('previewPanel');
     const elFooterText = document.getElementById('footerText');
+    const elFormatoCores = document.getElementById('formatoCores');
+    const elFormatoCoresVal = document.getElementById('formatoCoresVal');
 
     function atualizarLabels() {
       elTamanhoFonteVal.textContent = elTamanhoFonte.value + 'px';
@@ -445,6 +468,11 @@
       elDecaimentoVal.textContent = parseInt(elDecaimento.value, 10) + '%';
       elUnidadeCssVal.textContent = elUnidadeCss.value === 'em' ? 'Proporcional (em)' : 'Fixo (px)';
       elEscalaVal.textContent = parseFloat(elEscala.value).toFixed(1) + 'x';
+      elFormatoCoresVal.textContent = elFormatoCores.value === 'fixo'
+        ? 'Fixo (rgba)'
+        : elFormatoCores.value === 'canais'
+          ? 'Variáveis (canais RGB)'
+          : 'Variáveis (color-mix)';
 
       if (elUnidadeCss.value === 'em') {
         elEscalaControl.classList.remove('hidden');
@@ -591,6 +619,7 @@
       const cos = Math.cos(theta);
       const sin = Math.sin(theta);
       const [r, g, b] = hexToRgb(elCor.value);
+      const corHex = elCor.value;
       const baseAlpha = parseFloat(elAlpha.value);
       const textColor = elCorTexto.value;
       const bgColor = elCorFundo.value;
@@ -599,6 +628,24 @@
       const unidade = elUnidadeCss.value;
       const fontSize = parseFloat(elTamanhoFonte.value) || 96;
       const escala = parseFloat(elEscala.value) || 1.0;
+      const formato = elFormatoCores.value;
+
+      const suportaColorMix = typeof CSS !== 'undefined' && CSS.supports
+        ? CSS.supports('color', 'color-mix(in srgb, #000 4%, transparent)')
+        : true;
+      // O preview usa o mesmo formato do CSS exportado; se o navegador não entender
+      // color-mix, cai para canais RGB (o resultado visual é idêntico).
+      const formatoPreview = (formato === 'variaveis' && !suportaColorMix) ? 'canais' : formato;
+
+      // A cor de cada passo só muda no alpha, então ela é montada a partir de:
+      //  - var(--shadow-color) + color-mix (moderno, aceita hex direto)
+      //  - var(--shadow-rgb) + rgba()      (compatibilidade máxima)
+      //  - rgba() fixo                     (sem variáveis, como antes)
+      function corDoPasso(formatoUsado, alpha) {
+        if (formatoUsado === 'fixo') return `rgba(${r},${g},${b},${alpha.toFixed(4)})`;
+        if (formatoUsado === 'canais') return `rgba(var(--shadow-rgb), ${alpha.toFixed(4)})`;
+        return `color-mix(in srgb, var(--shadow-color) ${(alpha * 100).toFixed(2)}%, transparent)`;
+      }
 
       const previewShadows = [];
       const cssShadows = [];
@@ -612,31 +659,51 @@
 
         const dxPreview = unidade === 'em' ? dxPx * escala : dxPx;
         const dyPreview = unidade === 'em' ? dyPx * escala : dyPx;
-        previewShadows.push(`${dxPreview.toFixed(2)}px ${dyPreview.toFixed(2)}px rgba(${r},${g},${b},${alpha.toFixed(4)})`);
+        previewShadows.push(`${dxPreview.toFixed(2)}px ${dyPreview.toFixed(2)}px ${corDoPasso(formatoPreview, alpha)}`);
 
         if (unidade === 'em') {
           const dxEm = dxPx / fontSize;
           const dyEm = dyPx / fontSize;
-          cssShadows.push(`calc(var(--shadow-scale, 1) * ${dxEm.toFixed(4)}em) calc(var(--shadow-scale, 1) * ${dyEm.toFixed(4)}em) rgba(${r},${g},${b},${alpha.toFixed(4)})`);
+          cssShadows.push(`calc(var(--shadow-scale, 1) * ${dxEm.toFixed(4)}em) calc(var(--shadow-scale, 1) * ${dyEm.toFixed(4)}em) ${corDoPasso(formato, alpha)}`);
         } else {
-          cssShadows.push(`${dxPx.toFixed(2)}px ${dyPx.toFixed(2)}px rgba(${r},${g},${b},${alpha.toFixed(4)})`);
+          cssShadows.push(`${dxPx.toFixed(2)}px ${dyPx.toFixed(2)}px ${corDoPasso(formato, alpha)}`);
         }
       }
 
       elPreview.textContent = texto || 'Lorem Ipsum';
       elPreview.style.fontSize = elTamanhoFonte.value + 'px';
       elPreview.style.transform = `skewY(${elSkewY.value}deg)`;
+      elPreview.style.setProperty('--shadow-color', corHex);
+      elPreview.style.setProperty('--shadow-rgb', `${r}, ${g}, ${b}`);
       elPreview.style.textShadow = previewShadows.join(', ');
       elPreview.style.color = textColor;
       elPreviewPanel.style.background = bgColor;
 
-      let css = '';
+      const usaVariaveis = formato !== 'fixo';
+      const linhas = ['.long-shadow {'];
+
       if (unidade === 'em') {
-        css = `/* Sombra proporcional ao tamanho da fonte e escalável via variável CSS */\n.long-shadow {\n  --shadow-scale: ${escala.toFixed(1)}; /* Altere para multiplicar o alcance da sombra */\n  color: ${textColor};\n  background: ${bgColor};\n  text-shadow: ${cssShadows.join(', ')};\n}`;
-      } else {
-        css = `.long-shadow {\n  color: ${textColor};\n  background: ${bgColor};\n  text-shadow: ${cssShadows.join(', ')};\n}`;
+        linhas.push('  /* Sombra proporcional ao tamanho da fonte e escalável via variável CSS */');
+        linhas.push(`  --shadow-scale: ${escala.toFixed(1)}; /* Altere para multiplicar o alcance da sombra */`);
       }
-      elCssOutput.textContent = css;
+
+      if (usaVariaveis) {
+        linhas.push('  /* Cores do efeito: troque só estas variáveis para mudar tudo */');
+        if (formato === 'canais') {
+          linhas.push(`  --shadow-rgb: ${r}, ${g}, ${b}; /* "R, G, B" da sombra */`);
+        } else {
+          linhas.push(`  --shadow-color: ${corHex};`);
+        }
+        linhas.push(`  --text-color: ${textColor};`);
+        linhas.push(`  --bg-color: ${bgColor};`);
+      }
+
+      linhas.push(`  color: ${usaVariaveis ? 'var(--text-color)' : textColor};`);
+      linhas.push(`  background: ${usaVariaveis ? 'var(--bg-color)' : bgColor};`);
+      linhas.push(`  text-shadow: ${cssShadows.join(', ')};`);
+      linhas.push('}');
+
+      elCssOutput.textContent = linhas.join('\n');
     }
 
     function init() {
@@ -654,6 +721,7 @@
       elEscala.value = '1.0';
       elCorTexto.value = '#000000';
       elCorFundo.value = '#ffffff';
+      elFormatoCores.value = 'variaveis';
       atualizarLabels();
       atualizarVisibilidadeModo();
       gerarSombra();
@@ -673,6 +741,7 @@
     elEscala.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
     elCorTexto.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
     elCorFundo.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+    elFormatoCores.addEventListener('change', () => { atualizarLabels(); gerarSombra(); });
 
     // Preset buttons
     document.querySelectorAll('.preset-btn').forEach(btn => {
