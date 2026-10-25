@@ -50,6 +50,15 @@
 
     .control {
       margin-bottom: 16px;
+      transition: opacity 0.3s ease, max-height 0.3s ease;
+    }
+
+    .control.hidden {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      margin-bottom: 0;
+      pointer-events: none;
     }
 
     .control label {
@@ -73,6 +82,16 @@
       width: 100%;
     }
 
+    .control select {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+    }
+
     .value {
       color: var(--fg);
       font-weight: 600;
@@ -86,6 +105,7 @@
       border-radius: 12px;
       padding: 24px;
       min-height: 420px;
+      transition: background 0.3s ease;
     }
 
     .text {
@@ -95,6 +115,7 @@
       color: var(--fg);
       word-break: break-word;
       text-align: center;
+      transition: color 0.3s ease, text-shadow 0.3s ease, font-size 0.2s ease;
     }
 
     .row {
@@ -136,16 +157,105 @@
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s ease;
     }
 
     .btn:hover {
       background: #e5e7eb;
+    }
 
-      *::before {
-        outline: #1f6feb;
-        outline-width: 1px;
-        outline-offset: 1px;
-      }
+    /* Tooltip styles */
+    .tooltip-icon {
+      cursor: help;
+      color: var(--accent);
+      font-weight: bold;
+      margin-left: 4px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip-icon:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      background: #1f2937;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: normal;
+      max-width: 220px;
+      width: max-content;
+      z-index: 1000;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 8px;
+      line-height: 1.4;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .tooltip-icon:hover::before {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-bottom-color: #1f2937;
+      z-index: 1001;
+    }
+
+    /* Presets styles */
+    .presets-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .presets-section h2 {
+      font-size: 16px;
+      margin: 0 0 12px;
+      color: var(--fg);
+    }
+
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .preset-btn {
+      padding: 12px 8px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-align: center;
+      background: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preset-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--preset-color, #ccc);
+    }
+
+    .preset-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-color: var(--preset-color, #ccc);
+    }
+
+    .preset-btn:active {
+      transform: translateY(0);
     }
   </style>
 </head>
@@ -157,6 +267,21 @@
       <div class="control">
         <label for="texto"><span>Texto</span></label>
         <input id="texto" type="text" placeholder="Lorem Ipsum" />
+      </div>
+      <div class="control">
+        <label for="tamanhoFonte">
+          <span>Tamanho da Fonte (px) <span class="tooltip-icon"
+              data-tooltip="Crie o efeito no tamanho do elemento que será utilizado, na mesma proporção. A sombra tem distância fixa e não escala com o tamanho do elemento.">ⓘ</span></span>
+          <span class="value" id="tamanhoFonteVal"></span>
+        </label>
+        <input id="tamanhoFonte" type="range" min="12" max="200" step="1" value="96" />
+      </div>
+      <div class="control">
+        <label for="skewY">
+          <span>Inclinação (skewY)</span>
+          <span class="value" id="skewYVal"></span>
+        </label>
+        <input id="skewY" type="range" min="-45" max="45" step="1" value="0" />
       </div>
       <div class="control">
         <label for="quantidade"><span>Quantidade de sombras</span><span class="value" id="quantidadeVal"></span></label>
@@ -190,12 +315,63 @@
             <option value="percentual">Percentual</option>
           </select>
         </div>
-        <div class="control">
+        <div class="control" id="decaimentoControl">
           <label for="decaimento"><span>Decaimento (%)</span><span class="value" id="decaimentoVal"></span></label>
           <input id="decaimento" type="range" min="0" max="50" step="1" />
         </div>
       </div>
-      <div class="footer">0° para a direita, sentido horário. Transparência decresce linearmente ao longo das sombras.
+      <div class="row">
+        <div class="control">
+          <label for="unidadeCss">
+            <span>Unidade do CSS <span class="tooltip-icon"
+                data-tooltip="Escolha entre Proporcional (em / Variáveis CSS) que se ajusta a qualquer tamanho de fonte ou Pixel fixo (px).">ⓘ</span></span>
+            <span class="value" id="unidadeCssVal"></span>
+          </label>
+          <select id="unidadeCss">
+            <option value="em">em / Variáveis CSS (Proporcional)</option>
+            <option value="px">px (Fixo)</option>
+          </select>
+        </div>
+        <div class="control" id="escalaControl">
+          <label for="escala">
+            <span>Escala (--shadow-scale) <span class="tooltip-icon"
+                data-tooltip="Multiplicador dinâmico da extensão da sombra via variável CSS.">ⓘ</span></span>
+            <span class="value" id="escalaVal">1.0x</span>
+          </label>
+          <input id="escala" type="range" min="0.1" max="5" step="0.1" value="1.0" />
+        </div>
+      </div>
+      <div class="footer" id="footerText">0° para a direita, sentido horário.</div>
+
+      <!-- Presets Section -->
+      <div class="presets-section">
+        <h2>Temas Pré-definidos</h2>
+        <div class="presets-grid">
+          <button class="preset-btn" data-preset="neon" style="--preset-color: #00ffff;">
+            Neon Cyberpunk
+          </button>
+          <button class="preset-btn" data-preset="vintage" style="--preset-color: #ff8c42;">
+            Vintage Retro
+          </button>
+          <button class="preset-btn" data-preset="minimal" style="--preset-color: #cccccc;">
+            Minimalista
+          </button>
+          <button class="preset-btn" data-preset="ocean" style="--preset-color: #0077be;">
+            Oceano
+          </button>
+          <button class="preset-btn" data-preset="sunset" style="--preset-color: #f7931e;">
+            Sunset
+          </button>
+          <button class="preset-btn" data-preset="dark" style="--preset-color: #ffffff;">
+            Dark Mode
+          </button>
+          <button class="preset-btn" data-preset="pastel" style="--preset-color: #c77dff;">
+            Pastel
+          </button>
+          <button class="preset-btn" data-preset="fire" style="--preset-color: #ff6600;">
+            Fire/Lava
+          </button>
+        </div>
       </div>
     </div>
     <div class="panel preview" id="previewPanel">
@@ -221,6 +397,10 @@
   </div>
   <script>
     const elTexto = document.getElementById('texto');
+    const elTamanhoFonte = document.getElementById('tamanhoFonte');
+    const elTamanhoFonteVal = document.getElementById('tamanhoFonteVal');
+    const elSkewY = document.getElementById('skewY');
+    const elSkewYVal = document.getElementById('skewYVal');
     const elQuantidade = document.getElementById('quantidade');
     const elDistancia = document.getElementById('distancia');
     const elAngulo = document.getElementById('angulo');
@@ -238,13 +418,22 @@
     const elModoVal = document.getElementById('modoVal');
     const elDecaimento = document.getElementById('decaimento');
     const elDecaimentoVal = document.getElementById('decaimentoVal');
+    const elDecaimentoControl = document.getElementById('decaimentoControl');
+    const elUnidadeCss = document.getElementById('unidadeCss');
+    const elUnidadeCssVal = document.getElementById('unidadeCssVal');
+    const elEscala = document.getElementById('escala');
+    const elEscalaVal = document.getElementById('escalaVal');
+    const elEscalaControl = document.getElementById('escalaControl');
     const elCorTexto = document.getElementById('corTexto');
     const elCorTextoVal = document.getElementById('corTextoVal');
     const elCorFundo = document.getElementById('corFundo');
     const elCorFundoVal = document.getElementById('corFundoVal');
     const elPreviewPanel = document.getElementById('previewPanel');
+    const elFooterText = document.getElementById('footerText');
 
     function atualizarLabels() {
+      elTamanhoFonteVal.textContent = elTamanhoFonte.value + 'px';
+      elSkewYVal.textContent = elSkewY.value + '°';
       elQuantidadeVal.textContent = elQuantidade.value;
       elDistanciaVal.textContent = parseFloat(elDistancia.value).toFixed(2) + 'px';
       elAnguloVal.textContent = elAngulo.value + '°';
@@ -254,8 +443,137 @@
       elCorFundoVal.textContent = elCorFundo.value;
       elModoVal.textContent = elModo.value === 'percentual' ? 'Percentual' : 'Linear';
       elDecaimentoVal.textContent = parseInt(elDecaimento.value, 10) + '%';
+      elUnidadeCssVal.textContent = elUnidadeCss.value === 'em' ? 'Proporcional (em)' : 'Fixo (px)';
+      elEscalaVal.textContent = parseFloat(elEscala.value).toFixed(1) + 'x';
+
+      if (elUnidadeCss.value === 'em') {
+        elEscalaControl.classList.remove('hidden');
+      } else {
+        elEscalaControl.classList.add('hidden');
+      }
     }
 
+    function atualizarVisibilidadeModo() {
+      const modo = elModo.value;
+
+      if (modo === 'percentual') {
+        elDecaimentoControl.classList.remove('hidden');
+        elFooterText.textContent = '0° para a direita, sentido horário. Transparência decresce percentualmente.';
+      } else {
+        elDecaimentoControl.classList.add('hidden');
+        elFooterText.textContent = '0° para a direita, sentido horário. Transparência decresce linearmente.';
+      }
+    }
+
+    const presets = {
+      neon: {
+        corFundo: '#0a0e27',
+        corTexto: '#00ffff',
+        corSombra: '#ff00ff',
+        alpha: 0.06,
+        quantidade: 80,
+        distancia: 1,
+        angulo: 135,
+        modo: 'percentual',
+        decaimento: 3
+      },
+      vintage: {
+        corFundo: '#f5e6d3',
+        corTexto: '#8b4513',
+        corSombra: '#ff8c42',
+        alpha: 0.05,
+        quantidade: 60,
+        distancia: 1.2,
+        angulo: 45,
+        modo: 'percentual',
+        decaimento: 5
+      },
+      minimal: {
+        corFundo: '#ffffff',
+        corTexto: '#000000',
+        corSombra: '#cccccc',
+        alpha: 0.08,
+        quantidade: 50,
+        distancia: 1,
+        angulo: 45,
+        modo: 'linear',
+        decaimento: 0
+      },
+      ocean: {
+        corFundo: '#e0f7ff',
+        corTexto: '#003d5c',
+        corSombra: '#0077be',
+        alpha: 0.04,
+        quantidade: 70,
+        distancia: 1,
+        angulo: 90,
+        modo: 'percentual',
+        decaimento: 4
+      },
+      sunset: {
+        corFundo: '#ff6b35',
+        corTexto: '#f7931e',
+        corSombra: '#c1121f',
+        alpha: 0.07,
+        quantidade: 65,
+        distancia: 1.5,
+        angulo: 225,
+        modo: 'percentual',
+        decaimento: 6
+      },
+      dark: {
+        corFundo: '#121212',
+        corTexto: '#ffffff',
+        corSombra: '#333333',
+        alpha: 0.15,
+        quantidade: 55,
+        distancia: 1,
+        angulo: 135,
+        modo: 'linear',
+        decaimento: 0
+      },
+      pastel: {
+        corFundo: '#ffd6e8',
+        corTexto: '#9d4edd',
+        corSombra: '#c77dff',
+        alpha: 0.06,
+        quantidade: 75,
+        distancia: 0.8,
+        angulo: 315,
+        modo: 'percentual',
+        decaimento: 5
+      },
+      fire: {
+        corFundo: '#1a1a1a',
+        corTexto: '#ff6600',
+        corSombra: '#cc0000',
+        alpha: 0.08,
+        quantidade: 90,
+        distancia: 1,
+        angulo: 180,
+        modo: 'percentual',
+        decaimento: 4
+      }
+    };
+
+    function aplicarPreset(presetName) {
+      const preset = presets[presetName];
+      if (!preset) return;
+
+      elCorFundo.value = preset.corFundo;
+      elCorTexto.value = preset.corTexto;
+      elCor.value = preset.corSombra;
+      elAlpha.value = preset.alpha;
+      elQuantidade.value = preset.quantidade;
+      elDistancia.value = preset.distancia;
+      elAngulo.value = preset.angulo;
+      elModo.value = preset.modo;
+      elDecaimento.value = preset.decaimento;
+
+      atualizarLabels();
+      atualizarVisibilidadeModo();
+      gerarSombra();
+    }
     function hexToRgb(h) {
       const s = h.replace('#', '');
       const r = parseInt(s.slice(0, 2), 16);
@@ -278,27 +596,53 @@
       const bgColor = elCorFundo.value;
       const p = Math.max(0, Math.min(1, parseInt(elDecaimento.value, 10) / 100));
       const fator = 1 - p;
+      const unidade = elUnidadeCss.value;
+      const fontSize = parseFloat(elTamanhoFonte.value) || 96;
+      const escala = parseFloat(elEscala.value) || 1.0;
 
-      const shadows = [];
+      const previewShadows = [];
+      const cssShadows = [];
+
       for (let i = 1; i <= N; i++) {
-        const dx = cos * step * i;
-        const dy = sin * step * i;
+        const dxPx = cos * step * i;
+        const dyPx = sin * step * i;
         const alpha = elModo.value === 'percentual'
           ? baseAlpha * Math.pow(fator, i - 1)
           : baseAlpha * ((N - i + 1) / N);
-        shadows.push(`${dx.toFixed(2)}px ${dy.toFixed(2)}px rgba(${r},${g},${b},${alpha.toFixed(4)})`);
+
+        const dxPreview = unidade === 'em' ? dxPx * escala : dxPx;
+        const dyPreview = unidade === 'em' ? dyPx * escala : dyPx;
+        previewShadows.push(`${dxPreview.toFixed(2)}px ${dyPreview.toFixed(2)}px rgba(${r},${g},${b},${alpha.toFixed(4)})`);
+
+        if (unidade === 'em') {
+          const dxEm = dxPx / fontSize;
+          const dyEm = dyPx / fontSize;
+          cssShadows.push(`calc(var(--shadow-scale, 1) * ${dxEm.toFixed(4)}em) calc(var(--shadow-scale, 1) * ${dyEm.toFixed(4)}em) rgba(${r},${g},${b},${alpha.toFixed(4)})`);
+        } else {
+          cssShadows.push(`${dxPx.toFixed(2)}px ${dyPx.toFixed(2)}px rgba(${r},${g},${b},${alpha.toFixed(4)})`);
+        }
       }
 
       elPreview.textContent = texto || 'Lorem Ipsum';
-      elPreview.style.textShadow = shadows.join(', ');
+      elPreview.style.fontSize = elTamanhoFonte.value + 'px';
+      elPreview.style.transform = `skewY(${elSkewY.value}deg)`;
+      elPreview.style.textShadow = previewShadows.join(', ');
       elPreview.style.color = textColor;
       elPreviewPanel.style.background = bgColor;
-      const css = `.long-shadow {\n  color: ${textColor};\n  background: ${bgColor};\n  text-shadow: ${elPreview.style.textShadow};\n}`;
+
+      let css = '';
+      if (unidade === 'em') {
+        css = `/* Sombra proporcional ao tamanho da fonte e escalável via variável CSS */\n.long-shadow {\n  --shadow-scale: ${escala.toFixed(1)}; /* Altere para multiplicar o alcance da sombra */\n  color: ${textColor};\n  background: ${bgColor};\n  text-shadow: ${cssShadows.join(', ')};\n}`;
+      } else {
+        css = `.long-shadow {\n  color: ${textColor};\n  background: ${bgColor};\n  text-shadow: ${cssShadows.join(', ')};\n}`;
+      }
       elCssOutput.textContent = css;
     }
 
     function init() {
       elTexto.value = '';
+      elTamanhoFonte.value = '96';
+      elSkewY.value = '0';
       elQuantidade.value = '62';
       elDistancia.value = '1';
       elAngulo.value = '45';
@@ -306,22 +650,37 @@
       elAlpha.value = '0.04';
       elModo.value = 'percentual';
       elDecaimento.value = '5';
+      elUnidadeCss.value = 'em';
+      elEscala.value = '1.0';
       elCorTexto.value = '#000000';
       elCorFundo.value = '#ffffff';
       atualizarLabels();
+      atualizarVisibilidadeModo();
       gerarSombra();
     }
 
     elTexto.addEventListener('input', gerarSombra);
+    elTamanhoFonte.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+    elSkewY.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
     elQuantidade.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
     elDistancia.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
     elAngulo.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
     elCor.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
     elAlpha.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
-    elModo.addEventListener('change', () => { atualizarLabels(); gerarSombra(); });
+    elModo.addEventListener('change', () => { atualizarLabels(); atualizarVisibilidadeModo(); gerarSombra(); });
     elDecaimento.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+    elUnidadeCss.addEventListener('change', () => { atualizarLabels(); atualizarVisibilidadeModo(); gerarSombra(); });
+    elEscala.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
     elCorTexto.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
     elCorFundo.addEventListener('input', () => { atualizarLabels(); gerarSombra(); });
+
+    // Preset buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = btn.getAttribute('data-preset');
+        aplicarPreset(preset);
+      });
+    });
 
     init();
 
