@@ -5,6 +5,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#f8faf3" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icones/favicon-32.png" />
+  <link rel="apple-touch-icon" href="icones/apple-touch-icon-180.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Long Shadow" />
   <title>Long Shadow CSS Generator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -735,6 +741,18 @@
       height: 16px;
     }
 
+    /* O atributo hidden precisa vencer o display: inline-flex do botão */
+    .btn-ghost[hidden] {
+      display: none;
+    }
+
+    .topbar-acoes {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 8px;
+    }
+
     /* ---------------------------------------------
        Modal "Sobre"
        --------------------------------------------- */
@@ -963,6 +981,151 @@
     }
 
     /* ---------------------------------------------
+       Modal "Instalar no PC"
+       --------------------------------------------- */
+    .gif-demo {
+      margin: 0;
+    }
+
+    .gif-moldura {
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-lg);
+      background: var(--surface-container-low);
+    }
+
+    .gif-midia {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .gif-midia[hidden] {
+      display: none;
+    }
+
+    .gif-vazio {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 22px;
+      color: var(--on-surface-variant);
+      text-align: center;
+    }
+
+    .gif-vazio[hidden] {
+      display: none;
+    }
+
+    .gif-vazio svg {
+      width: 26px;
+      height: 26px;
+      color: var(--primary-container);
+    }
+
+    .gif-vazio p {
+      margin: 0;
+      font-size: 11.5px;
+      line-height: 1.55;
+    }
+
+    .gif-vazio strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--on-surface);
+      font-size: 12px;
+    }
+
+    .gif-vazio code {
+      padding: 1px 4px;
+      border-radius: 5px;
+      background: var(--surface-container-lowest);
+      font-family: var(--font-mono);
+      font-size: 0.94em;
+    }
+
+    .gif-demo figcaption {
+      margin-top: 8px;
+      color: var(--on-surface-variant);
+      font-size: 10.5px;
+      line-height: 1.5;
+    }
+
+    .passos {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .passos li {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+    }
+
+    .passo-num {
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary-fixed);
+      color: var(--primary);
+      font-family: var(--font-display);
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+
+    .passos strong {
+      display: block;
+      color: var(--on-surface);
+      font-size: 12.5px;
+    }
+
+    .passos p {
+      margin: 2px 0 0;
+      color: var(--on-surface-variant);
+      font-size: 11.5px;
+      line-height: 1.5;
+    }
+
+    .passos code {
+      padding: 1px 4px;
+      border-radius: 5px;
+      background: var(--surface-container-low);
+      font-family: var(--font-mono);
+      font-size: 0.94em;
+    }
+
+    .modal-acoes {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal-acoes .btn {
+      padding: 11px 20px;
+      font-size: 12.5px;
+    }
+
+    .btn[hidden] {
+      display: none;
+    }
+
+    /* ---------------------------------------------
        Responsivo
        --------------------------------------------- */
     /* Desktop: o palco fica visível durante o scroll e a coluna de saída não
@@ -1011,6 +1174,10 @@
         display: none;
       }
 
+      .btn-ghost--icone span {
+        display: none;
+      }
+
       .panel--config,
       .panel--stage,
       .panel--code {
@@ -1046,14 +1213,26 @@
         <span class="brand-sub">text-shadow em camadas</span>
       </span>
     </div>
-    <button id="abrirSobre" class="btn-ghost" type="button" aria-haspopup="dialog" aria-controls="sobreDialog">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
-        <path d="M12 10.8v5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-        <circle cx="12" cy="7.9" r="1.15" fill="currentColor" />
-      </svg>
-      Sobre
-    </button>
+    <div class="topbar-acoes">
+      <button id="abrirInstalar" class="btn-ghost btn-ghost--icone" type="button" aria-haspopup="dialog"
+        aria-controls="instalarDialog" aria-label="Instalar no PC">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 4v10.2m0 0 3.9-3.9m-3.9 3.9-3.9-3.9" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M5 17.4v1.3A2.3 2.3 0 0 0 7.3 21h9.4a2.3 2.3 0 0 0 2.3-2.3v-1.3" fill="none"
+            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <span>Instalar no PC</span>
+      </button>
+      <button id="abrirSobre" class="btn-ghost" type="button" aria-haspopup="dialog" aria-controls="sobreDialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
+          <path d="M12 10.8v5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="12" cy="7.9" r="1.15" fill="currentColor" />
+        </svg>
+        Sobre
+      </button>
+    </div>
   </header>
   <div class="app">
     <section class="panel panel--config" aria-labelledby="tituloConfig">
@@ -1286,6 +1465,66 @@
     </div>
   </dialog>
 
+  <dialog id="instalarDialog" class="modal" aria-labelledby="instalarTitulo">
+    <div class="modal-card">
+      <button id="fecharInstalar" class="modal-close" type="button" aria-label="Fechar" autofocus>&times;</button>
+
+      <header class="modal-head modal-head--texto">
+        <div class="modal-id">
+          <span class="eyebrow">PWA</span>
+          <h2 id="instalarTitulo">Instalar no PC</h2>
+          <p class="modal-role">Janela própria, atalho no Iniciar e funcionamento offline.</p>
+        </div>
+      </header>
+
+      <figure class="gif-demo">
+        <div class="gif-moldura">
+          <div class="gif-vazio" id="gifVazio">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.6" />
+              <path d="M10 9.1v5.8l4.6-2.9-4.6-2.9Z" fill="currentColor" />
+            </svg>
+            <p><strong>GIF da instalação</strong>Salve como <code>instalacao.gif</code> nesta pasta (ideal 16:9) e ele
+              aparece aqui.</p>
+          </div>
+          <img id="gifInstalacao" class="gif-midia" src="instalacao.gif"
+            alt="Animação mostrando a instalação do app pelo navegador" width="640" height="360"
+            onload="document.getElementById('gifVazio').hidden = true" onerror="this.hidden = true" />
+        </div>
+        <figcaption>Da barra de endereço até o app aberto em janela própria.</figcaption>
+      </figure>
+
+      <ol class="passos">
+        <li>
+          <span class="passo-num" aria-hidden="true">1</span>
+          <div>
+            <strong>Abra por HTTPS ou localhost</strong>
+            <p>Em <code>file://</code> o navegador não instala. O GitHub Pages já serve em HTTPS.</p>
+          </div>
+        </li>
+        <li>
+          <span class="passo-num" aria-hidden="true">2</span>
+          <div>
+            <strong>Clique em instalar</strong>
+            <p>Ícone na barra de endereço, este botão ou menu ⋮ → <em>Instalar Long Shadow CSS Generator</em>.</p>
+          </div>
+        </li>
+        <li>
+          <span class="passo-num" aria-hidden="true">3</span>
+          <div>
+            <strong>Confirme</strong>
+            <p>O app abre em janela própria e fica no menu Iniciar. Depois disso funciona offline.</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="modal-acoes">
+        <button id="instalarAgora" class="btn" type="button" hidden>Instalar agora</button>
+        <button id="fecharInstalar2" class="btn-ghost" type="button">Fechar</button>
+      </div>
+    </div>
+  </dialog>
+
   <script>
     const elTexto = document.getElementById('texto');
     const elTamanhoFonte = document.getElementById('tamanhoFonte');
@@ -1401,12 +1640,13 @@
         corFundo: '#e0f7ff',
         corTexto: '#003d5c',
         corSombra: '#0077be',
-        alpha: 0.04,
+        alpha: 0.06,
         quantidade: 70,
         distancia: 1,
-        angulo: 90,
+        angulo: 45,
         modo: 'percentual',
-        decaimento: 4
+        decaimento: 6,
+        escala: 0.4
       },
       sunset: {
         corFundo: '#ff6b35',
@@ -1467,6 +1707,7 @@
       elAngulo.value = preset.angulo;
       elModo.value = preset.modo;
       elDecaimento.value = preset.decaimento;
+      if (preset.escala !== undefined) elEscala.value = preset.escala;
 
       atualizarLabels();
       atualizarVisibilidadeModo();
@@ -1671,6 +1912,67 @@
       if (elFecharSobre) {
         elFecharSobre.addEventListener('click', () => elSobreDialog.close());
       }
+    }
+
+    // PWA: modal "Instalar no PC" + prompt nativo quando o navegador oferece
+    const elInstalarDialog = document.getElementById('instalarDialog');
+    const elAbrirInstalar = document.getElementById('abrirInstalar');
+    const elFecharInstalar = document.getElementById('fecharInstalar');
+    const elFecharInstalar2 = document.getElementById('fecharInstalar2');
+    const elInstalarAgora = document.getElementById('instalarAgora');
+    let promptInstalacao = null;
+
+    if (elAbrirInstalar && elInstalarDialog) {
+      elAbrirInstalar.addEventListener('click', () => {
+        if (typeof elInstalarDialog.showModal === 'function') {
+          elInstalarDialog.showModal();
+        } else {
+          elInstalarDialog.setAttribute('open', '');
+        }
+      });
+
+      elInstalarDialog.addEventListener('click', (ev) => {
+        if (ev.target === elInstalarDialog) elInstalarDialog.close();
+      });
+
+      [elFecharInstalar, elFecharInstalar2].forEach((botao) => {
+        if (botao) botao.addEventListener('click', () => elInstalarDialog.close());
+      });
+    }
+
+    // O botão "Instalar agora" só aparece quando o navegador permite instalar
+    window.addEventListener('beforeinstallprompt', (evento) => {
+      evento.preventDefault();
+      promptInstalacao = evento;
+      if (elInstalarAgora) elInstalarAgora.hidden = false;
+    });
+
+    if (elInstalarAgora) {
+      elInstalarAgora.addEventListener('click', async () => {
+        if (!promptInstalacao) return;
+        promptInstalacao.prompt();
+        const escolha = await promptInstalacao.userChoice;
+        promptInstalacao = null;
+        elInstalarAgora.hidden = true;
+        if (escolha.outcome === 'accepted' && elInstalarDialog) elInstalarDialog.close();
+      });
+    }
+
+    window.addEventListener('appinstalled', () => {
+      promptInstalacao = null;
+      if (elInstalarAgora) elInstalarAgora.hidden = true;
+    });
+
+    // PWA: service worker (exige http/https ou localhost; em file:// não registra)
+    const podeTerServiceWorker = 'serviceWorker' in navigator &&
+      (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+
+    if (podeTerServiceWorker) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {
+          /* sem SW a página continua funcionando, só não fica offline */
+        });
+      });
     }
   </script>
 </body>
