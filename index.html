@@ -997,7 +997,13 @@
       overflow: hidden;
       aspect-ratio: 16 / 9;
       border-radius: var(--radius-lg);
-      background: var(--surface-container-low);
+      background-color: var(--surface-container-low);
+      /* versão otimizada (23 KB) do print instalar.avif, que tem 5,5 MB */
+      background-image: url("instalar.avif");
+      box-shadow: inset 1px 1px 20px 2px #baf1849c;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
     }
 
     .gif-midia {
@@ -1017,28 +1023,32 @@
       inset: 0;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 22px;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 12px;
+      background: linear-gradient(180deg,
+          rgba(248, 250, 243, 0) 55%,
+          rgba(248, 250, 243, 0.55) 100%);
       color: var(--on-surface-variant);
-      text-align: center;
+      text-align: left;
     }
 
     .gif-vazio[hidden] {
       display: none;
     }
 
-    .gif-vazio svg {
-      width: 26px;
-      height: 26px;
-      color: var(--primary-container);
-    }
-
+    /* Legenda em placa de vidro sobre o print de fundo */
     .gif-vazio p {
+      max-width: 92%;
       margin: 0;
-      font-size: 11.5px;
-      line-height: 1.55;
+      padding: 9px 13px;
+      border-radius: var(--radius-md);
+      background: rgba(248, 250, 243, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-soft);
+      font-size: 11px;
+      line-height: 1.5;
     }
 
     .gif-vazio strong {
@@ -1489,14 +1499,7 @@
 
       <figure class="gif-demo">
         <div class="gif-moldura">
-          <div class="gif-vazio" id="gifVazio">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.6" />
-              <path d="M10 9.1v5.8l4.6-2.9-4.6-2.9Z" fill="currentColor" />
-            </svg>
-            <p><strong>GIF da instalação</strong>Salve como <code>instalacao.gif</code> nesta pasta (ideal 16:9) e ele
-              aparece aqui.</p>
-          </div>
+
           <img id="gifInstalacao" class="gif-midia" src="instalacao.gif"
             alt="Animação mostrando a instalação do app pelo navegador" width="640" height="360"
             onload="document.getElementById('gifVazio').hidden = true" onerror="this.hidden = true" />
@@ -1505,24 +1508,11 @@
       </figure>
 
       <ol class="passos">
+
         <li>
-          <span class="passo-num" aria-hidden="true">1</span>
+          <span class="passo-num" aria-hidden="true">!</span>
           <div>
-            <strong>Abra por HTTPS ou localhost</strong>
-            <p>Em <code>file://</code> o navegador não instala. O GitHub Pages já serve em HTTPS.</p>
-          </div>
-        </li>
-        <li>
-          <span class="passo-num" aria-hidden="true">2</span>
-          <div>
-            <strong>Clique em instalar</strong>
-            <p>Ícone na barra de endereço, este botão ou menu ⋮ → <em>Instalar Long Shadow CSS Generator</em>.</p>
-          </div>
-        </li>
-        <li>
-          <span class="passo-num" aria-hidden="true">3</span>
-          <div>
-            <strong>Confirme</strong>
+            <strong>Clique no botão abaixo para intalar agora</strong>
             <p>O app abre em janela própria e fica no menu Iniciar. Depois disso funciona offline.</p>
           </div>
         </li>

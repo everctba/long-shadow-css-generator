@@ -1,7 +1,7 @@
 /* Service worker do Long Shadow CSS Generator.
    Estratégia: app shell em cache (offline) + fontes do Google em
    stale-while-revalidate. Ao publicar mudanças, troque VERSAO. */
-const VERSAO = 'v1.0.0';
+const VERSAO = 'v1.0.1';
 const CACHE_APP = 'long-shadow-app-' + VERSAO;
 const CACHE_FONTES = 'long-shadow-fontes';
 
@@ -10,6 +10,7 @@ const SHELL = [
   './index.html',
   './manifest.webmanifest',
   './fotoever.jpeg',
+  './instalar-fundo.webp',
   './icones/icon-192.png',
   './icones/icon-512.png',
   './icones/icon-maskable-512.png',

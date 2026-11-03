@@ -48,9 +48,11 @@ use o ícone de instalação na barra de endereço, o botão **Instalar no PC** 
 superior (abre um modal com o passo a passo) ou o menu ⋮ → *Instalar Long Shadow CSS
 Generator*. Instalado, o app abre em janela própria, sem barra de endereço.
 
-O modal **Instalar no PC** reserva uma área para o GIF da demonstração: salve o arquivo
-como `instalacao.gif` na raiz do projeto e ele aparece no lugar do placeholder
-automaticamente (não precisa mexer no código nem no manifest).
+A área de demonstração do modal **Instalar no PC** tem como fundo um print do processo de
+instalação: `instalar.avif` é o original (5,5 MB) e a página usa a versão otimizada
+`instalar-fundo.webp` (23 KB, 1000×581) — mesma imagem, ~240× mais leve. Para trocar por um
+GIF, salve `instalacao.gif` na raiz: ele assume o lugar do print automaticamente (não precisa
+mexer no código nem no manifest).
 ![Instalar no PC](./preview-instalar.png)
 
 **Ao publicar mudanças:** troque `VERSAO` no topo de `sw.js` (ex.: `v1.0.1`) para renovar o
