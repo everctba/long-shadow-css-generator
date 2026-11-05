@@ -431,6 +431,44 @@
       transform: translateY(0);
     }
 
+    /* Sheen diagonal no hover do botão Copiar CSS */
+    #copiarCss {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    #copiarCss::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      z-index: -1;
+      border-radius: inherit;
+      background: linear-gradient(78deg, rgb(66 206 186 / 0%) 48%, rgb(255 255 255 / 29%) 50%, rgb(79 255 232 / 0%) 78%);
+      pointer-events: none;
+      transition: width var(--duration-breath) var(--ease-breath);
+    }
+
+    #copiarCss:hover::before,
+    #copiarCss:focus-visible::before {
+      animation: copiarCssSheen var(--duration-breath) var(--ease-breath) forwards;
+    }
+
+    @keyframes copiarCssSheen {
+      0% {
+        width: 0;
+        left: 0px;
+      }
+
+      100% {
+        width: 100%;
+        left: 80px;
+      }
+    }
+
     /* Momento "recompensa": blush suave do secondary-container */
     .btn.copiado {
       background-image: none;
@@ -1398,14 +1436,14 @@
           <button class="preset-btn" data-preset="sunset" style="--preset-color: #f7931e;">
             Sunset
           </button>
-          <button class="preset-btn" data-preset="dark" style="--preset-color: #ffffff;">
-            Dark Mode
+          <button class="preset-btn" data-preset="film-noir" style="--preset-color: #ffffff;">
+            Film Noir
           </button>
           <button class="preset-btn" data-preset="pastel" style="--preset-color: #c77dff;">
             Pastel
           </button>
-          <button class="preset-btn" data-preset="fire" style="--preset-color: #ff6600;">
-            Fire/Lava
+          <button class="preset-btn" data-preset="surf" style="--preset-color: #7438ff;">
+            Surf
           </button>
         </div>
       </section>
@@ -1656,22 +1694,27 @@
         corTexto: '#f7931e',
         corSombra: '#c1121f',
         alpha: 0.07,
-        quantidade: 65,
-        distancia: 1.5,
+        quantidade: 85,
+        distancia: 0.37,
         angulo: 225,
         modo: 'percentual',
-        decaimento: 6
+        decaimento: 6,
+        skewY: -14
       },
-      dark: {
+      'film-noir': {
         corFundo: '#121212',
         corTexto: '#ffffff',
         corSombra: '#333333',
-        alpha: 0.15,
-        quantidade: 55,
-        distancia: 1,
-        angulo: 135,
+        alpha: 1,
+        quantidade: 120,
+        distancia: 0.04,
+        angulo: 57,
         modo: 'linear',
-        decaimento: 0
+        decaimento: 0,
+        tamanhoFonte: 98,
+        skewY: -10,
+        unidade: 'em',
+        escala: 5
       },
       pastel: {
         corFundo: '#ffd6e8',
@@ -1684,16 +1727,20 @@
         modo: 'percentual',
         decaimento: 5
       },
-      fire: {
-        corFundo: '#1a1a1a',
-        corTexto: '#ff6600',
-        corSombra: '#cc0000',
-        alpha: 0.08,
-        quantidade: 90,
-        distancia: 1,
-        angulo: 180,
-        modo: 'percentual',
-        decaimento: 4
+      surf: {
+        corFundo: '#7438ff',
+        corTexto: '#ffffff',
+        corSombra: '#0e327c',
+        alpha: 1,
+        quantidade: 300,
+        distancia: 2.15,
+        angulo: 46,
+        modo: 'linear',
+        decaimento: 0,
+        unidade: 'px',
+        formato: 'variaveis',
+        tamanhoFonte: 83,
+        skewY: -13
       }
     };
 
@@ -1711,6 +1758,10 @@
       elModo.value = preset.modo;
       elDecaimento.value = preset.decaimento;
       if (preset.escala !== undefined) elEscala.value = preset.escala;
+      if (preset.unidade !== undefined) elUnidadeCss.value = preset.unidade;
+      if (preset.formato !== undefined) elFormatoCores.value = preset.formato;
+      if (preset.tamanhoFonte !== undefined) elTamanhoFonte.value = preset.tamanhoFonte;
+      if (preset.skewY !== undefined) elSkewY.value = preset.skewY;
 
       atualizarLabels();
       atualizarVisibilidadeModo();

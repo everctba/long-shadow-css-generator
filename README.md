@@ -61,8 +61,10 @@ cache — a navegação é rede-primeiro, os arquivos estáticos são cache-prim
 ## Presets
 
 Os 8 temas da coluna de ajustes aplicam cor de fundo, cor do texto, cor da sombra, alpha,
-quantidade, distância, ângulo, modo de transparência e decaimento de uma vez; o preset
-**Oceano** também define a escala do efeito (`--shadow-scale: 0.4`).
+quantidade, distância, ângulo, modo de transparência e decaimento de uma vez. Alguns também
+mexem nas opções de exportação: **Oceano** define a escala (`--shadow-scale: 0.4`) e **Surf**
+(ex-Fire/Lava) usa 300 camadas de 2,15 px a 46°, em `px` com as cores em variáveis.
 ![Preset Oceano](./preview-oceano.png)
+![Preset Surf](./preview-surf.png)
 
 
